@@ -1,0 +1,96 @@
+name: Yocto embedded linux
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ '.github/workflows/yocto.yml', 'build-raspberrypi3-64.sh' ]
+  schedule:
+    - cron: 0 19 * * *
+  watch:
+    types: started
+
+env:
+  TZ: Asia/Shanghai
+
+
+# Action will return to the startup working directory every run
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Initialization environment
+        run: |
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo -E apt-get -qq update
+          sudo -E apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential \
+                chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping \
+                python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit mesa-common-dev
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "$TZ"
+
+      - name: Setup building environment
+        run: |
+            sudo ln -sf /bin/bash /bin/sh
+            sudo mkdir -p /opt && sudo -E chmod 777 /opt
+            sudo mkdir -p /Yocto && sudo -E chmod 777 /Yocto
+            echo "WORKDIR=/Yocto" >> $GITHUB_ENV
+            #echo "DESTDIR=/opt" >> $GITHUB_ENV
+            echo "DESTDIR=/Yocto/poky/build/tmp/deploy" >> $GITHUB_ENV
+
+      - name: Setup yocto
+        run: |
+            cd ${WORKDIR}
+            git clone -b gatesgarth git://git.yoctoproject.org/poky
+
+      - name: Building targets
+        run: |
+            cd ${WORKDIR}
+            git clone https://github.com/wbrn/yocto-actions
+            cp yocto-actions/build-*.sh poky
+            cd poky
+            chmod +x build-*.sh
+            ./build-all.sh
+
+      - name: Pack
+        run: |
+            cd /Yocto/poky/build/tmp
+            tar -Jcf yocto-deploy.tar.xz ${DESTDIR}
+            echo "PACKAGE=/Yocto/poky/build/tmp/deploy.tar.xz" >> $GITHUB_ENV
+
+      - name: Upload package
+        uses: actions/upload-artifact@master
+        with:
+          name: yocto deploy
+          path: ${{env.PACKAGE}}
+
+      - name: Generate release tag
+        id: tag
+        run: |
+          echo "::set-output name=release_tag::$(date +"%Y.%m.%d")"
+          touch release.txt
+          echo "* yocto deploy for Ubuntu$(lsb_release -s -r)" >> release.txt
+          echo "::set-output name=status::success"
+
+      - name: Upload package to release
+        id: release
+        uses: softprops/action-gh-release@v1
+        if: steps.tag.outputs.status == 'success' && !cancelled()
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: ${{steps.tag.outputs.release_tag}}
+          body_path: release.txt
+          files: ${{env.PACKAGE}}
+          
+      - name: Remove old Releases
+        uses: dev-drprasad/delete-older-releases@v0.1.0
+        with:
+          keep_latest: 3
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
