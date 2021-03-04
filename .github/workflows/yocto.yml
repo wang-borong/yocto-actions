@@ -71,7 +71,6 @@ jobs:
       - name: Setup building environment
         run: |
             sudo ln -sf /bin/bash /bin/sh
-            sudo mkdir -p /opt && sudo -E chmod 777 /opt
             sudo mkdir -p /Yocto && sudo -E chmod 777 /Yocto
             echo "WORKDIR=/Yocto" >> $GITHUB_ENV
             #echo "DESTDIR=/opt" >> $GITHUB_ENV
