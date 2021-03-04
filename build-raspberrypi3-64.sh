@@ -17,7 +17,7 @@ sed -i '/qt5-ptest/aPACKAGECONFIG_remove = "tslib"' ../meta-qt5/recipes-qt/qt5/q
 
 # building image
 bitbake core-image-base
-bitbase qtbase
+bitbake qtbase
 bitbake image -c populate_sdk_ext
 
 exit 0
