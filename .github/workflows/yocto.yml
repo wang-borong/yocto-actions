@@ -92,7 +92,7 @@ jobs:
         run: |
             cd /Yocto/poky/build/tmp
             tar -Jcf yocto-deploy.tar.xz deploy
-            echo "PACKAGE=/Yocto/poky/build/tmp/deploy.tar.xz" >> $GITHUB_ENV
+            echo "PACKAGE=/Yocto/poky/build/tmp/yocto-deploy.tar.xz" >> $GITHUB_ENV
 
       - name: Upload package
         uses: actions/upload-artifact@master
