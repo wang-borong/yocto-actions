@@ -73,8 +73,6 @@ jobs:
             sudo ln -sf /bin/bash /bin/sh
             sudo mkdir -p /Yocto && sudo -E chmod 777 /Yocto
             echo "WORKDIR=/Yocto" >> $GITHUB_ENV
-            #echo "DESTDIR=/opt" >> $GITHUB_ENV
-            echo "DESTDIR=/Yocto/poky/build/tmp/deploy" >> $GITHUB_ENV
 
       - name: Setup yocto
         run: |
@@ -93,7 +91,7 @@ jobs:
       - name: Pack
         run: |
             cd /Yocto/poky/build/tmp
-            tar -Jcf yocto-deploy.tar.xz ${DESTDIR}
+            tar -Jcf yocto-deploy.tar.xz deploy
             echo "PACKAGE=/Yocto/poky/build/tmp/deploy.tar.xz" >> $GITHUB_ENV
 
       - name: Upload package
