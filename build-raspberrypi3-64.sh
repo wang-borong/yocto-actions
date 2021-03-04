@@ -6,7 +6,9 @@ git clone -b gatesgarth https://github.com/meta-qt5/meta-qt5
 
 source oe-init-build-env # in build dir
 
-bitbake add-layer ../meta-raspberrypi
+bitbake-layers add-layer ../meta-raspberrypi
+bitbake-layers add-layer ../meta-qt5
+
 # modify local.conf to build raspberrypi3 64-bit system
 sed -i '/^MACHINE/s/= .*$/= "raspberrypi3-64"/g' conf/local.conf
 sed -i '/^#SDKMA/s/#\(.*\)=.*$/\1= "x86_64"/g'  conf/local.conf
