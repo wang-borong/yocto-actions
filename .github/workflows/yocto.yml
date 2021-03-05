@@ -17,6 +17,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 800
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
@@ -80,6 +81,7 @@ jobs:
             git clone -b gatesgarth git://git.yoctoproject.org/poky
 
       - name: Building targets
+        timeout-minutes: 720
         run: |
             cd ${WORKDIR}
             git clone https://github.com/wbrn/yocto-actions
