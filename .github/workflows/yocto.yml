@@ -79,6 +79,7 @@ jobs:
         run: |
             cd ${WORKDIR}
             git clone -b gatesgarth git://git.yoctoproject.org/poky
+            df -h
 
       - name: Building targets
         run: |
@@ -88,6 +89,9 @@ jobs:
             cd poky
             chmod +x build-*.sh
             ./build-all.sh
+
+      - name: Check disk usage
+        run: df -h
 
       - name: Pack
         run: |
