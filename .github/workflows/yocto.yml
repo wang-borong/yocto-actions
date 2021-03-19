@@ -96,7 +96,7 @@ jobs:
       - name: Pack
         run: |
             cd /Yocto/poky/build/tmp
-            tar -Jcf yocto-deploy.tar.xz deploy/{sdk,images}
+            tar -Jcf yocto-deploy.tar.xz deploy/images
             echo "PACKAGE=/Yocto/poky/build/tmp/yocto-deploy.tar.xz" >> $GITHUB_ENV
 
       - name: Upload package
