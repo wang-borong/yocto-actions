@@ -3,7 +3,7 @@ name: Yocto embedded linux
 on:
   push:
     branches: [ main ]
-    paths: [ '.github/workflows/yocto.yml', 'build-raspberrypi3-64-image.sh' ]
+    paths: [ '.github/workflows/yocto.yml', 'build-raspberrypi3-64-esdk.sh' ]
   schedule:
     - cron: 0 19 * * *
   watch:
@@ -88,7 +88,7 @@ jobs:
             cp yocto-actions/build-*.sh poky
             cd poky
             chmod +x build-*.sh
-            ./build-raspberrypi3-64-image.sh
+            ./build-raspberrypi3-64-esdk.sh
 
       - name: Check disk usage
         run: df -h
@@ -96,8 +96,8 @@ jobs:
       - name: Pack
         run: |
             cd /Yocto/poky/build/tmp
-            tar -Jcf yocto-image.tar.xz deploy/images
-            echo "PACKAGE=/Yocto/poky/build/tmp/yocto-image.tar.xz" >> $GITHUB_ENV
+            tar -Jcf yocto-sdk.tar.xz deploy/sdk
+            echo "PACKAGE=/Yocto/poky/build/tmp/yocto-sdk.tar.xz" >> $GITHUB_ENV
 
       - name: Upload package
         uses: actions/upload-artifact@master
@@ -110,7 +110,7 @@ jobs:
         run: |
           echo "::set-output name=release_tag::$(date +"%Y.%m.%d")"
           touch release.txt
-          echo "* yocto deploy image for Ubuntu$(lsb_release -s -r)" >> release.txt
+          echo "* yocto deploy esdk for Ubuntu$(lsb_release -s -r)" >> release.txt
           echo "::set-output name=status::success"
 
       - name: Upload package to release

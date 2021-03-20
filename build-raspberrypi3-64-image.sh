@@ -19,5 +19,3 @@ sed -i '/^#SDKMA/s/#\(.*\)=.*$/\1= "x86_64"/g'  conf/local.conf
 bitbake core-image-base
 #bitbake qtbase
 #bitbake core-image-base -c populate_sdk_ext
-
-#exit 0
